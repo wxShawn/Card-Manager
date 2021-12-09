@@ -2,8 +2,8 @@
   <el-container>
     <el-header>
       <el-row>
-        <el-col :span="12">ME. Card Manager</el-col>
-        <el-col :span="12" style="text-align:right; line-height:60px">
+        <el-col :span="20">ME. Card Manager</el-col>
+        <el-col :span="4" style="text-align:right; line-height:60px">
           <el-popover
             placement="bottom"
             :title="helpInfo.title"

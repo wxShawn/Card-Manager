@@ -3,7 +3,22 @@
     <template #header>
       <div class="card-header">
         <span>卡牌激活</span>
-        <el-button class="button" type="text" @click="addData">新增</el-button>
+        <div>
+          <el-button type="text" @click="addData">新增</el-button>
+          <el-button type="text" @click="dialogVisible = true">批量导入</el-button>
+          <el-dialog v-model="dialogVisible" title="卡牌激活记录导入">
+            <el-upload action="#" :auto-upload="false" :file-list="fileList" :on-change="loadJsonFile">
+              <el-button size="small" type="primary">选择文件</el-button>
+              <template #tip>
+                <div class="el-upload__tip">
+                  支持导入json文件,格式：
+                  {"arData": [{"date": "yy-mm-dd", cards: ["白羊": 2, "双子": 0, ......]}, ......]}
+                </div>
+              </template>
+            </el-upload>
+            <div style="color: #f00">{{ tip }}</div>
+          </el-dialog>
+        </div>
       </div>
     </template>
     <el-table :data="arTableData" stripe height="743" style="width: 100%">
@@ -53,10 +68,85 @@ export default {
   ],
   data() {
     return {
-      
+      dialogVisible: false,
+      fileList: [],
+      tip: '',
     }
   },
   methods: {
+    loadJsonFile: function(file,fileList) {
+      this.tip = '';
+      if (fileList.length > 0) {//替换前面上传的文件
+        this.fileList = [fileList[fileList.length - 1]];
+      }
+      let reader = new FileReader();
+      reader.readAsText(file.raw);
+      reader.onload = (e) => {
+        try {//验证文件的数据格式
+          let format = false;
+          let dataList = JSON.parse(e.target.result)['arData'];
+          if (dataList) {
+            for (let i = 0; i < dataList.length; i++) {
+              if (dataList[i].date && dataList[i].cards) {
+                let cards = dataList[i].cards
+                for (let j = 0; j < cards.length; j++) {
+                  if (cards[j].type) {
+                    switch (cards[j].type) {
+                      case '白羊+射手':
+                      case '双子+水瓶':
+                      case '巨蟹+双鱼':
+                      case '金牛+摩羯':
+                      case '天秤+天蝎':
+                      case '狮子+天蝎':
+                      case '处女+天秤':
+                      case '白羊':
+                      case '金牛':
+                      case '双子':
+                      case '巨蟹':
+                      case '狮子':
+                      case '处女':
+                      case '天秤':
+                      case '天蝎':
+                      case '射手':
+                      case '摩羯':
+                      case '水瓶':
+                      case '双鱼':
+                        if ((cards[j].amount || cards[j].amount == 0) && (typeof cards[j].amount === 'number')) {
+                          format = true;//格式验证成功
+                        } else {
+                          format = false;
+                          this.tip = `arData[${i}].cards[${j}].amount属性格式错误或不存在`;
+                          console.log(this.tip);
+                        }
+                        break;
+                      default:
+                        format = false;
+                        this.tip = `arData[${i}].cards[${j}].type属性格式错误`;
+                        console.log(this.tip);
+                        break;
+                    }
+                  }else {
+                    format = false;
+                    this.tip = `arData[${i}].cards[${j}].amount属性格式不存在`;
+                    console.log(this.tip);
+                  }
+                }
+              } else {
+                format = false;
+                this.tip = `arData[${i}].date 或 arData[${i}].cards属性格式不存在`;
+                console.log(this.tip);
+              }
+            }
+          }
+          if (format) {//验证成功，将数据上传至父组件
+            this.$emit('changeData', dataList);
+          }
+        } catch (error) {
+          this.tip = '文件格式不正确!';
+          console.log(this.tip);
+        }
+      }
+    },
     changeData: function(d) {//更新数据（bug：日期无法自动同步，传入表格对应行d进行手动赋值）
       var newArData = this.arData;
       if (d) {//如果传入d，则修改日期
