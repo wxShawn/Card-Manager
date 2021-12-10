@@ -94,6 +94,7 @@ export default {
             income += (cardCalc(this.arData[j].cards).income) / 40;
           }
         }
+        income = parseFloat(income.toFixed(4));//保留4位小数并删除末尾无效的'0'（解决js浮点数运算丢失精度的问题）
         incomeList.push(income);
         dateList.push(addDay(today, i));
       }
