@@ -1,7 +1,7 @@
 # ME Card Manager
 ![ME card manager](https://github.com/wxShawn/Media-Lib/blob/main/images/1639125514.png)
 ## 介绍
-这是一个用来辅助计算 [ME](http://official.memetaverse.art/) 卡牌收益的 Web app，添加或导入卡牌激活记录程序会自动计算出每天的收益产出、未产出等数据。
+这是一个用来辅助计算 ME 卡牌收益的 Web app，添加或导入卡牌激活记录程序会自动计算出每天的收益产出、未产出等数据。
 ## 使用方法
 点击卡牌激活记录模块的 `新增` 按钮，然后设置对应的日期、卡牌数量即可看到其他模块的数据实时更新。同时，也可以使用批量导入功能，导入如下格式的 **json** 文件:
 ```javascript
